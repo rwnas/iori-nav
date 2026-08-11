@@ -24,8 +24,30 @@ jobs:
       - name: Build TailwindCSS
         run: npm run build:css
 
+      - name: Create wrangler.toml with bindings
+        run: |
+          cat > wrangler.toml << 'WREOF'
+          name = "iori-nav"
+          compatibility_date = "2025-09-06"
+          pages_build_output_dir = "public"
+
+          [[d1_databases]]
+          binding = "NAV_DB"
+          database_name = "book"
+          database_id = "a204955c-73cc-4773-85fc-4fe2a91c9640"
+
+          [[kv_namespaces]]
+          binding = "NAV_AUTH"
+          id = "2cd855a40d9d4118964719582e9fcde2"
+
+          [vars]
+          ENABLE_PUBLIC_SUBMISSION = "false"
+          SITE_NAME = "灰色轨迹"
+          ICON_API = "https://faviconsnap.com/api/favicon?url="
+          WREOF
+
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy public --project-name=iori-nav --branch=master
+        run: npx wrangler pages deploy
         env:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
